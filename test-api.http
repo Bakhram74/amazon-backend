@@ -1,0 +1,6 @@
+POST http://localhost:8080/auth/sign-up
+Content-Type: application/json
+
+{   "username":"Petya",
+"password":"qwerty",
+"phone_number":"990999101"}

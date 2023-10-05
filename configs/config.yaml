@@ -1,0 +1,13 @@
+
+http_address: "0.0.0.0:8080"
+token_symmetric_key: "12345678901234567890123456789012"
+access_token_duration: "15m"
+refresh_token_duration: "24h"
+redis_address: "0.0.0.0:6379"
+storage:
+  username: "root"
+  host: "localhost"
+  password: "secret"
+  port: "5432"
+  database: "advertisement"
+  ssl_mode: "disable"
