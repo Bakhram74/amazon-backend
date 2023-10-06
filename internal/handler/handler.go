@@ -5,6 +5,7 @@ import (
 	"github.com/Bakhram74/amazon.git/internal/config"
 	"github.com/Bakhram74/amazon.git/internal/service"
 	"github.com/Bakhram74/amazon.git/pkg/token"
+	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"
 )
@@ -31,7 +32,17 @@ func NewHandler(config config.Config, services *service.Service) (*Handler, erro
 
 func (h *Handler) InitRoutes() *gin.Engine {
 	router := gin.New()
+	corsConfig := cors.DefaultConfig()
 
+	corsConfig.AllowOrigins = []string{"https://localhost:3000"}
+	// To be able to send tokens to the server.
+	corsConfig.AllowCredentials = true
+
+	// OPTIONS method for ReactJS
+	corsConfig.AddAllowMethods("OPTIONS")
+
+	// Register the middleware
+	router.Use(cors.New(corsConfig))
 	auth := router.Group("/auth")
 	{
 		auth.POST("/sign-up", h.signUp)
