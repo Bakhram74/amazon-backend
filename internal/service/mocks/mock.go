@@ -6,10 +6,9 @@ package mock_service
 
 import (
 	context "context"
-	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
 	reflect "reflect"
 
-
+	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
 	gomock "go.uber.org/mock/gomock"
 )
 

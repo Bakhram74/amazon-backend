@@ -4,6 +4,7 @@ import (
 	"context"
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
 	"github.com/Bakhram74/amazon-backend.git/internal/repository"
+	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 )
 
 type AuthService struct {
@@ -15,6 +16,11 @@ func NewAuthService(repo repository.Authorization) *AuthService {
 }
 
 func (service *AuthService) CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error) {
+	var err error
+	arg.Password, err = utils.HashPassword(arg.Password)
+	if err != nil {
+		return db.User{}, nil
+	}
 	return service.repo.CreateUser(ctx, arg)
 }
 

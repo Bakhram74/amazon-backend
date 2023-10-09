@@ -13,9 +13,9 @@ func randomUser(t *testing.T) db.User {
 	hashedPassword, err := utils.HashPassword(utils.RandomString(8))
 	require.NoError(t, err)
 	arg := db.CreateUserParams{
-		Name:           utils.RandomString(6),
-		Email:          utils.RandomEmail(),
-		HashedPassword: hashedPassword,
+		Name:     utils.RandomString(6),
+		Email:    utils.RandomEmail(),
+		Password: hashedPassword,
 	}
 
 	user, err := testStore.CreateUser(context.Background(), arg)
@@ -24,7 +24,7 @@ func randomUser(t *testing.T) db.User {
 	require.NotZero(t, user.ID)
 	require.NotEmpty(t, user.AvatarPath)
 	require.Equal(t, arg.Name, user.Name)
-	require.Equal(t, arg.HashedPassword, user.HashedPassword)
+	require.Equal(t, arg.Password, user.Password)
 	return user
 }
 

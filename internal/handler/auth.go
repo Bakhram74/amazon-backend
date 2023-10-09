@@ -2,7 +2,6 @@ package handler
 
 import (
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
-	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -14,28 +13,6 @@ type createUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
-type userResponse struct {
-	ID         int64     `json:"id"`
-	Name       string    `json:"name"`
-	Email      string    `json:"email"`
-	Phone      string    `json:"phone"`
-	AvatarPath string    `json:"avatar_path"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	CreatedAt  time.Time `json:"created_at"`
-}
-
-func newUserResponse(user db.User) userResponse {
-	return userResponse{
-		ID:    user.ID,
-		Name:  user.Name,
-		Email: user.Email,
-
-		Phone:      user.Phone,
-		AvatarPath: user.AvatarPath,
-		UpdatedAt:  user.UpdatedAt,
-		CreatedAt:  user.CreatedAt,
-	}
-}
 func (h *Handler) signUp(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -43,16 +20,10 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		return
 	}
 
-	hashedPassword, err := utils.HashPassword(req.Password)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
-		return
-	}
-
 	arg := db.CreateUserParams{
-		Name:           req.Name,
-		Email:          req.Email,
-		HashedPassword: hashedPassword,
+		Name:     req.Name,
+		Email:    req.Email,
+		Password: req.Password,
 	}
 
 	user, err := h.services.CreateUser(ctx, arg)
@@ -64,8 +35,27 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
 		return
 	}
-
-	rsp := newUserResponse(user)
+	accessToken, _, err := h.tokenMaker.CreateToken(
+		user.ID,
+		h.config.AccessTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
+		return
+	}
+	refreshToken, _, err := h.tokenMaker.CreateToken(
+		user.ID,
+		h.config.RefreshTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
+		return
+	}
+	rsp := userData{
+		User:         newUserResponse(user),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -212,3 +202,31 @@ func (h *Handler) signUp(ctx *gin.Context) {
 //	}
 //	ctx.JSON(http.StatusOK, rsp)
 //}
+
+type userResponse struct {
+	ID         int64     `json:"id"`
+	Name       string    `json:"name"`
+	Email      string    `json:"email"`
+	Phone      string    `json:"phone"`
+	AvatarPath string    `json:"avatar_path"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	CreatedAt  time.Time `json:"created_at"`
+}
+
+func newUserResponse(user db.User) userResponse {
+	return userResponse{
+		ID:         user.ID,
+		Name:       user.Name,
+		Email:      user.Email,
+		Phone:      user.Phone,
+		AvatarPath: user.AvatarPath,
+		UpdatedAt:  user.UpdatedAt,
+		CreatedAt:  user.CreatedAt,
+	}
+}
+
+type userData struct {
+	User         userResponse `json:"user"`
+	AccessToken  string       `json:"access_token"`
+	RefreshToken string       `json:"refresh_token"`
+}

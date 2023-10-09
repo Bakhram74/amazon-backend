@@ -3,7 +3,7 @@ CREATE TABLE "users" (
                          "name" text NOT NULL UNIQUE ,
                          "email" text NOT NULL UNIQUE ,
                          "phone" text NOT NULL DEFAULT (''),
-                         "hashed_password" text NOT NULL,
+                         "password" text NOT NULL,
                          "avatar_path" text  NOT NULL DEFAULT ('/uploads/default-avatar.png'),
                          "updated_at" timestamptz NOT NULL DEFAULT (now()),
                          "created_at" timestamptz NOT NULL DEFAULT (now())
