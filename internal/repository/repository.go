@@ -7,6 +7,7 @@ import (
 
 type Authorization interface {
 	CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error)
+	GetUser(ctx context.Context, email string) (db.User, error)
 }
 
 type Repository struct {

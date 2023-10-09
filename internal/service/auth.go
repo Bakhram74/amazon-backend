@@ -24,6 +24,11 @@ func (service *AuthService) CreateUser(ctx context.Context, arg db.CreateUserPar
 	return service.repo.CreateUser(ctx, arg)
 }
 
+func (service *AuthService) GetUser(ctx context.Context, email string) (db.User, error) {
+
+	return service.repo.GetUser(ctx, email)
+}
+
 //func (service *AuthService) CreateSession(ctx context.Context, arg db.CreateSessionParams) (db.Session, error) {
 //	return service.repo.CreateSession(ctx, arg)
 //}

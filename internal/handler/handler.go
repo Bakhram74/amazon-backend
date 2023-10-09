@@ -49,14 +49,10 @@ func (h *Handler) InitRoutes() *gin.Engine {
 		auth := api.Group("/auth")
 		{
 			auth.POST("/sign-up", h.signUp)
-			//auth.POST("/sign-in", h.signIn)
-			//auth.POST("/refresh", h.renewAccessToken)
+			auth.POST("/sign-in", h.signIn)
+			auth.POST("/refresh", h.renewAccessToken)
 		}
 	}
 
 	return router
-}
-
-func errorResponse(msg string, err error) gin.H {
-	return gin.H{msg: err.Error()}
 }

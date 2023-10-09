@@ -1,7 +1,9 @@
 package handler
 
 import (
+	"errors"
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
+	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
@@ -16,7 +18,7 @@ type createUserRequest struct {
 func (h *Handler) signUp(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse("Invalid json provided", err))
+		ctx.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -32,7 +34,7 @@ func (h *Handler) signUp(ctx *gin.Context) {
 			ctx.JSON(http.StatusForbidden, err)
 			return
 		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
+		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 	accessToken, _, err := h.tokenMaker.CreateToken(
@@ -40,7 +42,7 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		h.config.AccessTokenDuration,
 	)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
+		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 	refreshToken, _, err := h.tokenMaker.CreateToken(
@@ -48,7 +50,7 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		h.config.RefreshTokenDuration,
 	)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
+		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
 	rsp := userData{
@@ -59,77 +61,58 @@ func (h *Handler) signUp(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-//type loginUserRequest struct {
-//	PhoneNumber string `json:"phone_number" binding:"required"`
-//	Password    string `json:"password" binding:"required,min=6"`
-//}
-//
-//type loginUserResponse struct {
-//	SessionID             uuid.UUID    `json:"session_id"`
-//	AccessToken           string       `json:"access_token"`
-//	AccessTokenExpiresAt  time.Time    `json:"access_token_expires_at"`
-//	RefreshToken          string       `json:"refresh_token"`
-//	RefreshTokenExpiresAt time.Time    `json:"refresh_token_expires_at"`
-//	User                  userResponse `json:"user"`
-//}
+type loginUserRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=6"`
+}
 
-//func (h *Handler) signIn(ctx *gin.Context) {
-//	var req loginUserRequest
-//	if err := ctx.ShouldBindJSON(&req); err != nil {
-//		ctx.JSON(http.StatusBadRequest, errorResponse("Invalid json provided", err))
-//		return
-//	}
-//
-//	user, err := h.services.GetUser(ctx, req.PhoneNumber)
-//	if err != nil {
-//		if errors.Is(err, db.ErrRecordNotFound) {
-//			ctx.JSON(http.StatusNotFound, errorResponse("User not found", err))
-//			return
-//		}
-//		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
-//		return
-//	}
-//
-//	err = utils.CheckPassword(req.Password, user.HashedPassword)
-//	if err != nil {
-//		ctx.JSON(http.StatusUnauthorized, errorResponse("Please provide valid login details", err))
-//		return
-//	}
-//	accessToken, accessPayload, err := h.tokenMaker.CreateToken(
-//		user.ID,
-//		h.config.AccessTokenDuration,
-//	)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
-//		return
-//	}
-//	refreshToken, refreshPayload, err := h.tokenMaker.CreateToken(
-//		user.ID,
-//		h.config.RefreshTokenDuration,
-//	)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
-//		return
-//	}
-//	session, err := h.services.CreateSession(ctx, db.CreateSessionParams{
-//		ID:           refreshPayload.ID,
-//		Userid:       user.ID,
-//		RefreshToken: refreshToken,
-//		UserAgent:    ctx.Request.UserAgent(),
-//		ClientIp:     ctx.ClientIP(),
-//		IsBlocked:    false,
-//		ExpiresAt:    refreshPayload.ExpiredAt,
-//	})
-//	rsp := loginUserResponse{
-//		SessionID:             session.ID,
-//		AccessToken:           accessToken,
-//		AccessTokenExpiresAt:  accessPayload.ExpiredAt,
-//		RefreshToken:          refreshToken,
-//		RefreshTokenExpiresAt: refreshPayload.ExpiredAt,
-//		User:                  newUserResponse(user),
-//	}
-//	ctx.JSON(http.StatusOK, rsp)
-//}
+func (h *Handler) signIn(ctx *gin.Context) {
+	var req loginUserRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	user, err := h.services.GetUser(ctx, req.Email)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, err.Error())
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	err = utils.CheckPassword(req.Password, user.Password)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	accessToken, _, err := h.tokenMaker.CreateToken(
+		user.ID,
+		h.config.AccessTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	refreshToken, _, err := h.tokenMaker.CreateToken(
+		user.ID,
+		h.config.RefreshTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	rsp := userData{
+		User:         newUserResponse(user),
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}
 
 //type renewAccessTokenRequest struct {
 //	RefreshToken string `json:"refresh_token" binding:"required"`

@@ -23,6 +23,14 @@ func (a AuthRepository) CreateUser(ctx context.Context, arg db.CreateUserParams)
 	return user, err
 }
 
+func (a AuthRepository) GetUser(ctx context.Context, email string) (db.User, error) {
+	user, err := a.store.GetUser(ctx, email)
+	if err != nil {
+		return db.User{}, err
+	}
+	return user, err
+}
+
 //func (a AuthRepository) CreateSession(ctx context.Context, arg db.CreateSessionParams) (db.Session, error) {
 //	session, err := a.store.CreateSession(ctx, arg)
 //	if err != nil {
