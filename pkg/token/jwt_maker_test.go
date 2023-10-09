@@ -1,7 +1,7 @@
 package token
 
 import (
-	"github.com/Bakhram74/amazon.git/pkg/utils"
+	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 	"testing"
 	"time"
 

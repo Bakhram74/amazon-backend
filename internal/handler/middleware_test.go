@@ -2,7 +2,7 @@ package handler
 
 import (
 	"fmt"
-	"github.com/Bakhram74/amazon.git/pkg/token"
+	"github.com/Bakhram74/amazon-backend.git/pkg/token"
 
 	"github.com/stretchr/testify/assert"
 	"net/http"

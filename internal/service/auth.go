@@ -2,8 +2,8 @@ package service
 
 import (
 	"context"
-	db "github.com/Bakhram74/amazon.git/db/sqlc"
-	"github.com/Bakhram74/amazon.git/internal/repository"
+	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
+	"github.com/Bakhram74/amazon-backend.git/internal/repository"
 )
 
 type AuthService struct {

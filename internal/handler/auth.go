@@ -1,8 +1,8 @@
 package handler
 
 import (
-	db "github.com/Bakhram74/amazon.git/db/sqlc"
-	"github.com/Bakhram74/amazon.git/pkg/utils"
+	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
+	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"

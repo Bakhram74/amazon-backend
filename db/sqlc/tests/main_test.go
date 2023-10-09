@@ -3,8 +3,8 @@ package tests
 import (
 	"context"
 	"fmt"
-	"github.com/Bakhram74/amazon.git/internal/config"
-	"github.com/Bakhram74/amazon.git/internal/repository"
+	"github.com/Bakhram74/amazon-backend.git/internal/config"
+	"github.com/Bakhram74/amazon-backend.git/internal/repository"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"log"

@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
-	"github.com/Bakhram74/amazon.git/internal/config"
-	"github.com/Bakhram74/amazon.git/internal/handler"
-	"github.com/Bakhram74/amazon.git/internal/repository"
-	"github.com/Bakhram74/amazon.git/internal/server"
-	"github.com/Bakhram74/amazon.git/internal/service"
-	"github.com/Bakhram74/amazon.git/pkg/client/postgresql"
-	"github.com/Bakhram74/amazon.git/pkg/logging"
+	"github.com/Bakhram74/amazon-backend.git/internal/config"
+	"github.com/Bakhram74/amazon-backend.git/internal/handler"
+	"github.com/Bakhram74/amazon-backend.git/internal/repository"
+	"github.com/Bakhram74/amazon-backend.git/internal/server"
+	"github.com/Bakhram74/amazon-backend.git/internal/service"
+	"github.com/Bakhram74/amazon-backend.git/pkg/client/postgresql"
+	"github.com/Bakhram74/amazon-backend.git/pkg/logging"
+
 	_ "github.com/jackc/pgx/v5"
 	"github.com/sirupsen/logrus"
 )

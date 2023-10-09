@@ -1,4 +1,4 @@
-module github.com/Bakhram74/amazon.git
+module github.com/Bakhram74/amazon-backend.git
 
 go 1.20
 

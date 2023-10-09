@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"github.com/Bakhram74/amazon.git/internal/config"
-	"github.com/Bakhram74/amazon.git/internal/service"
-	"github.com/Bakhram74/amazon.git/pkg/utils"
+	"github.com/Bakhram74/amazon-backend.git/internal/config"
+	"github.com/Bakhram74/amazon-backend.git/internal/service"
+	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
 	"os"

@@ -2,7 +2,7 @@ package handler
 
 import (
 	"errors"
-	"github.com/Bakhram74/amazon.git/pkg/token"
+	"github.com/Bakhram74/amazon-backend.git/pkg/token"
 
 	"github.com/gin-gonic/gin"
 	"net/http"

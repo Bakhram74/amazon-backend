@@ -2,9 +2,10 @@ package handler
 
 import (
 	"fmt"
-	"github.com/Bakhram74/amazon.git/internal/config"
-	"github.com/Bakhram74/amazon.git/internal/service"
-	"github.com/Bakhram74/amazon.git/pkg/token"
+	"github.com/Bakhram74/amazon-backend.git/internal/config"
+	"github.com/Bakhram74/amazon-backend.git/internal/service"
+	"github.com/Bakhram74/amazon-backend.git/pkg/token"
+
 	"github.com/gin-contrib/cors"
 
 	"github.com/gin-gonic/gin"

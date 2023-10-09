@@ -2,8 +2,9 @@ package tests
 
 import (
 	"context"
-	db "github.com/Bakhram74/amazon.git/db/sqlc"
-	"github.com/Bakhram74/amazon.git/pkg/utils"
+	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
+	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
+
 	"github.com/stretchr/testify/require"
 	"testing"
 )

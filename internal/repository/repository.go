@@ -2,7 +2,7 @@ package repository
 
 import (
 	"context"
-	db "github.com/Bakhram74/amazon.git/db/sqlc"
+	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
 )
 
 type Authorization interface {
