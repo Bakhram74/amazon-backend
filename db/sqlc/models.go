@@ -6,28 +6,15 @@ package db
 
 import (
 	"time"
-
-	"github.com/google/uuid"
 )
 
-type Session struct {
-	ID           uuid.UUID `json:"id"`
-	Userid       int64     `json:"userid"`
-	RefreshToken string    `json:"refresh_token"`
-	UserAgent    string    `json:"user_agent"`
-	ClientIp     string    `json:"client_ip"`
-	IsBlocked    bool      `json:"is_blocked"`
-	ExpiresAt    time.Time `json:"expires_at"`
-	CreatedAt    time.Time `json:"created_at"`
-}
-
 type User struct {
-	ID                int64     `json:"id"`
-	Username          string    `json:"username"`
-	PhoneNumber       string    `json:"phone_number"`
-	HashedPassword    string    `json:"hashed_password"`
-	Role              string    `json:"role"`
-	IsBanned          bool      `json:"is_banned"`
-	PasswordChangedAt time.Time `json:"password_changed_at"`
-	CreatedAt         time.Time `json:"created_at"`
+	ID             int64     `json:"id"`
+	Name           string    `json:"name"`
+	Email          string    `json:"email"`
+	Phone          string    `json:"phone"`
+	HashedPassword string    `json:"hashed_password"`
+	AvatarPath     string    `json:"avatar_path"`
+	UpdatedAt      time.Time `json:"updated_at"`
+	CreatedAt      time.Time `json:"created_at"`
 }

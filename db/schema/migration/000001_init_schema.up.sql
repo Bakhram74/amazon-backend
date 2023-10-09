@@ -1,10 +1,10 @@
 CREATE TABLE "users" (
                          "id" bigserial PRIMARY KEY,
-                         "username" text NOT NULL,
-                         "phone_number" text NOT NULL,
+                         "name" text NOT NULL UNIQUE ,
+                         "email" text NOT NULL UNIQUE ,
+                         "phone" text NOT NULL DEFAULT (''),
                          "hashed_password" text NOT NULL,
-                         "role" text NOT NULL DEFAULT ('user'),
-                         "is_banned" bool NOT NULL DEFAULT (false),
-                         "password_changed_at" timestamptz NOT NULL DEFAULT '0001-01-01',
+                         "avatar_path" text  NOT NULL DEFAULT ('/uploads/default-avatar.png'),
+                         "updated_at" timestamptz NOT NULL DEFAULT (now()),
                          "created_at" timestamptz NOT NULL DEFAULT (now())
 );

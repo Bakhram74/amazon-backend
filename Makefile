@@ -1,25 +1,23 @@
 
 
 docker_run:
-	docker run --name advertisement -e POSTGRES_USER=root -e POSTGRES_PASSWORD=secret -p 5432:5432 -d postgres
+	docker run --name amazon -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=123456 -p 5432:5432 -d postgres
 
 createDB:
-	docker exec -it advertisement createdb --username=root --owner=root
+	docker exec -it amazon createdb --username=postgres --owner=postgres amazon-record
 
 dropDB:
-	docker exec -it advertisement dropdb advertisement
+	docker exec -it amazon dropdb amazon-record
 
-docker_exec:
-	docker exec -it advertisement psql -U root
 
 migrate:
 	migrate create -ext sql -dir db/schema/migration -seq init_schema
 
 migrateUP:
-	migrate -path db/schema/migration -database "postgresql://root:secret@localhost:5432/advertisement?sslmode=disable" -verbose up
+	migrate -path db/schema/migration -database "postgresql://postgres:123456@localhost:5432/amazon-record?sslmode=disable" -verbose up
 
 migrateDown:
-	migrate -path db/schema/migration -database "postgresql://root:secret@localhost:5432/advertisement?sslmode=disable" -verbose down
+	migrate -path db/schema/migration -database "postgresql://postgres:123456@localhost:5432/amazon-record?sslmode=disable" -verbose down
 
 sqlc:
 	sqlc generate

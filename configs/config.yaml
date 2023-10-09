@@ -1,13 +1,15 @@
 
-http_address: "0.0.0.0:8080"
+http_address: "0.0.0.0:4200"
 token_symmetric_key: "12345678901234567890123456789012"
 access_token_duration: "15m"
 refresh_token_duration: "24h"
 redis_address: "0.0.0.0:6379"
+shop_id:
+payment_token:
 storage:
-  username: "root"
+  username: "postgres"
   host: "localhost"
-  password: "secret"
+  password: "123456"
   port: "5432"
-  database: "advertisement"
+  database: "amazon-record"
   ssl_mode: "disable"

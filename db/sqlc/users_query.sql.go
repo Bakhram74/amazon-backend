@@ -10,93 +10,31 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users ("username",
-                   "phone_number",
-                   "hashed_password")
-VALUES ($1, $2, $3) RETURNING id, username, phone_number, hashed_password, role, is_banned, password_changed_at, created_at
+INSERT INTO users ("name",
+                   "email",
+                   "hashed_password"
+
+                   )
+VALUES ($1, $2, $3) RETURNING id, name, email, phone, hashed_password, avatar_path, updated_at, created_at
 `
 
 type CreateUserParams struct {
-	Username       string `json:"username"`
-	PhoneNumber    string `json:"phone_number"`
+	Name           string `json:"name"`
+	Email          string `json:"email"`
 	HashedPassword string `json:"hashed_password"`
 }
 
 func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, createUser, arg.Username, arg.PhoneNumber, arg.HashedPassword)
+	row := q.db.QueryRow(ctx, createUser, arg.Name, arg.Email, arg.HashedPassword)
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
-		&i.PhoneNumber,
+		&i.Name,
+		&i.Email,
+		&i.Phone,
 		&i.HashedPassword,
-		&i.Role,
-		&i.IsBanned,
-		&i.PasswordChangedAt,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const getUser = `-- name: GetUser :one
-SELECT id, username, phone_number, hashed_password, role, is_banned, password_changed_at, created_at FROM users
-WHERE phone_number = $1 LIMIT 1
-`
-
-func (q *Queries) GetUser(ctx context.Context, phoneNumber string) (User, error) {
-	row := q.db.QueryRow(ctx, getUser, phoneNumber)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.PhoneNumber,
-		&i.HashedPassword,
-		&i.Role,
-		&i.IsBanned,
-		&i.PasswordChangedAt,
-		&i.CreatedAt,
-	)
-	return i, err
-}
-
-const partialUpdateUser = `-- name: PartialUpdateUser :one
-UPDATE users
-SET username = CASE WHEN $1::boolean THEN $2::TEXT ELSE username END,
-    phone_number  = CASE WHEN $3::boolean THEN $4::TEXT ELSE phone_number END,
-    hashed_password  = CASE WHEN $5::boolean THEN $6::TEXT ELSE hashed_password END
-WHERE id = $7
-RETURNING id, username, phone_number, hashed_password, role, is_banned, password_changed_at, created_at
-`
-
-type PartialUpdateUserParams struct {
-	UpdateUsername    bool   `json:"update_username"`
-	Username          string `json:"username"`
-	UpdatePhoneNumber bool   `json:"update_phone_number"`
-	PhoneNumber       string `json:"phone_number"`
-	UpdatePassword    bool   `json:"update_password"`
-	Password          string `json:"password"`
-	ID                int64  `json:"id"`
-}
-
-func (q *Queries) PartialUpdateUser(ctx context.Context, arg PartialUpdateUserParams) (User, error) {
-	row := q.db.QueryRow(ctx, partialUpdateUser,
-		arg.UpdateUsername,
-		arg.Username,
-		arg.UpdatePhoneNumber,
-		arg.PhoneNumber,
-		arg.UpdatePassword,
-		arg.Password,
-		arg.ID,
-	)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Username,
-		&i.PhoneNumber,
-		&i.HashedPassword,
-		&i.Role,
-		&i.IsBanned,
-		&i.PasswordChangedAt,
+		&i.AvatarPath,
+		&i.UpdatedAt,
 		&i.CreatedAt,
 	)
 	return i, err
