@@ -40,7 +40,7 @@ func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 			return
 		}
 
-		ctx.Set(userCtx, payload.Userid)
+		ctx.Set(userCtx, payload.UserId)
 		ctx.Next()
 	}
 }

@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
 	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
 	"github.com/gin-gonic/gin"
@@ -15,6 +16,7 @@ type createUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+// Register user
 func (h *Handler) signUp(ctx *gin.Context) {
 	var req createUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -37,27 +39,12 @@ func (h *Handler) signUp(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	accessToken, _, err := h.tokenMaker.CreateToken(
-		user.ID,
-		h.config.AccessTokenDuration,
-	)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	refreshToken, _, err := h.tokenMaker.CreateToken(
-		user.ID,
-		h.config.RefreshTokenDuration,
-	)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, err.Error())
-		return
-	}
-	rsp := userData{
-		User:         newUserResponse(user),
-		AccessToken:  accessToken,
-		RefreshToken: refreshToken,
-	}
+	rsp := newUserResponse(user)
+
 	ctx.JSON(http.StatusOK, rsp)
 }
 
@@ -66,6 +53,7 @@ type loginUserRequest struct {
 	Password string `json:"password" binding:"required,min=6"`
 }
 
+// Login user
 func (h *Handler) signIn(ctx *gin.Context) {
 	var req loginUserRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -97,7 +85,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-	refreshToken, _, err := h.tokenMaker.CreateToken(
+	refreshToken, refreshPayload, err := h.tokenMaker.CreateToken(
 		user.ID,
 		h.config.RefreshTokenDuration,
 	)
@@ -105,7 +93,19 @@ func (h *Handler) signIn(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, err.Error())
 		return
 	}
-
+	err = h.services.CreateSession(ctx, db.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Userid:       user.ID,
+		RefreshToken: refreshToken,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
 	rsp := userData{
 		User:         newUserResponse(user),
 		AccessToken:  accessToken,
@@ -114,77 +114,94 @@ func (h *Handler) signIn(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
-//type renewAccessTokenRequest struct {
-//	RefreshToken string `json:"refresh_token" binding:"required"`
-//}
-//
-//type renewAccessTokenResponse struct {
-//	AccessToken          string    `json:"access_token"`
-//	AccessTokenExpiresAt time.Time `json:"access_token_expires_at"`
-//}
+type renewAccessTokenRequest struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}
 
-//func (h *Handler) renewAccessToken(ctx *gin.Context) {
-//	var req renewAccessTokenRequest
-//	if err := ctx.ShouldBindJSON(&req); err != nil {
-//		ctx.JSON(http.StatusBadRequest, errorResponse("Invalid json provided", err))
-//		return
-//	}
-//
-//	refreshPayload, err := h.tokenMaker.VerifyToken(req.RefreshToken)
-//	if err != nil {
-//		ctx.JSON(http.StatusUnauthorized, errorResponse("Invalid refresh token", err))
-//		return
-//	}
-//
-//	session, err := h.services.GetSession(ctx, refreshPayload.ID)
-//	if err != nil {
-//		if errors.Is(err, db.ErrRecordNotFound) {
-//			ctx.JSON(http.StatusNotFound, errorResponse("Incorrect id", err))
-//			return
-//		}
-//		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
-//		return
-//	}
-//
-//	if session.IsBlocked {
-//		err := fmt.Errorf("blocked session")
-//		ctx.JSON(http.StatusUnauthorized, errorResponse("", err))
-//		return
-//	}
-//
-//	if session.Userid != refreshPayload.Userid {
-//		err := fmt.Errorf("incorrect session user")
-//		ctx.JSON(http.StatusUnauthorized, errorResponse("", err))
-//		return
-//	}
-//
-//	if session.RefreshToken != req.RefreshToken {
-//		err := fmt.Errorf("mismatched session token")
-//		ctx.JSON(http.StatusUnauthorized, errorResponse("", err))
-//		return
-//	}
-//
-//	if time.Now().After(session.ExpiresAt) {
-//		err := fmt.Errorf("expired session")
-//		ctx.JSON(http.StatusUnauthorized, errorResponse("", err))
-//		return
-//	}
-//
-//	accessToken, accessPayload, err := h.tokenMaker.CreateToken(
-//		refreshPayload.Userid,
-//		h.config.AccessTokenDuration,
-//	)
-//	if err != nil {
-//		ctx.JSON(http.StatusInternalServerError, errorResponse("Server error", err))
-//		return
-//	}
-//
-//	rsp := renewAccessTokenResponse{
-//		AccessToken:          accessToken,
-//		AccessTokenExpiresAt: accessPayload.ExpiredAt,
-//	}
-//	ctx.JSON(http.StatusOK, rsp)
-//}
+type renewAccessTokenResponse struct {
+	AccessToken  string `json:"access_token"`
+	RefreshToken string `json:"refresh_token"`
+}
+
+// Refresh token
+func (h *Handler) renewAccessToken(ctx *gin.Context) {
+	var req renewAccessTokenRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	refreshPayload, err := h.tokenMaker.VerifyToken(req.RefreshToken)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	session, err := h.services.GetSession(ctx, refreshPayload.ID)
+	if err != nil {
+		if errors.Is(err, db.ErrRecordNotFound) {
+			ctx.JSON(http.StatusNotFound, err.Error())
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	if session.IsBlocked {
+		err := fmt.Errorf("blocked session")
+		ctx.JSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if session.Userid != refreshPayload.UserId {
+		err := fmt.Errorf("incorrect session user")
+		ctx.JSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if session.RefreshToken != req.RefreshToken {
+		err := fmt.Errorf("mismatched session token")
+		ctx.JSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	if time.Now().After(session.ExpiresAt) {
+		err := fmt.Errorf("expired session")
+		ctx.JSON(http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	accessToken, _, err := h.tokenMaker.CreateToken(
+		refreshPayload.UserId,
+		h.config.AccessTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	refreshToken, refreshPayload, err := h.tokenMaker.CreateToken(
+		refreshPayload.UserId,
+		h.config.RefreshTokenDuration,
+	)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, err.Error())
+		return
+	}
+	err = h.services.CreateSession(ctx, db.CreateSessionParams{
+		ID:           refreshPayload.ID,
+		Userid:       refreshPayload.UserId,
+		RefreshToken: refreshToken,
+		UserAgent:    ctx.Request.UserAgent(),
+		ClientIp:     ctx.ClientIP(),
+		IsBlocked:    false,
+		ExpiresAt:    refreshPayload.ExpiredAt,
+	})
+	rsp := renewAccessTokenResponse{
+		AccessToken:  accessToken,
+		RefreshToken: refreshToken,
+	}
+	ctx.JSON(http.StatusOK, rsp)
+}
 
 type userResponse struct {
 	ID         int64     `json:"id"`

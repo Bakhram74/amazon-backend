@@ -5,6 +5,7 @@ import (
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
 	"github.com/Bakhram74/amazon-backend.git/internal/repository"
 	"github.com/Bakhram74/amazon-backend.git/pkg/utils"
+	"github.com/google/uuid"
 )
 
 type AuthService struct {
@@ -29,9 +30,9 @@ func (service *AuthService) GetUser(ctx context.Context, email string) (db.User,
 	return service.repo.GetUser(ctx, email)
 }
 
-//func (service *AuthService) CreateSession(ctx context.Context, arg db.CreateSessionParams) (db.Session, error) {
-//	return service.repo.CreateSession(ctx, arg)
-//}
-//func (service *AuthService) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
-//	return service.repo.GetSession(ctx, id)
-//}
+func (service *AuthService) CreateSession(ctx context.Context, arg db.CreateSessionParams) error {
+	return service.repo.CreateSession(ctx, arg)
+}
+func (service *AuthService) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
+	return service.repo.GetSession(ctx, id)
+}

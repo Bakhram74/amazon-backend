@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
+	"github.com/google/uuid"
 )
 
 type AuthRepository struct {
@@ -31,17 +32,17 @@ func (a AuthRepository) GetUser(ctx context.Context, email string) (db.User, err
 	return user, err
 }
 
-//func (a AuthRepository) CreateSession(ctx context.Context, arg db.CreateSessionParams) (db.Session, error) {
-//	session, err := a.store.CreateSession(ctx, arg)
-//	if err != nil {
-//		return db.Session{}, err
-//	}
-//	return session, err
-//}
-//func (a AuthRepository) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
-//	getSession, err := a.store.GetSession(ctx, id)
-//	if err != nil {
-//		return db.Session{}, err
-//	}
-//	return getSession, err
-//}
+func (a AuthRepository) CreateSession(ctx context.Context, arg db.CreateSessionParams) error {
+	err := a.store.CreateSession(ctx, arg)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+func (a AuthRepository) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
+	getSession, err := a.store.GetSession(ctx, id)
+	if err != nil {
+		return db.Session{}, err
+	}
+	return getSession, err
+}

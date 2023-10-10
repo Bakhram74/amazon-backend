@@ -154,6 +154,7 @@ func TestLoginUserAPI(t *testing.T) {
 					GetUser(gomock.Any(), gomock.Eq(user.Email)).
 					Times(1).
 					Return(user, nil)
+				r.EXPECT().CreateSession(gomock.Any(), gomock.Any())
 			},
 			checkResponse: func(recorder *httptest.ResponseRecorder) {
 				require.Equal(t, http.StatusOK, recorder.Code)

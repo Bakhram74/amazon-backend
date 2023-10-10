@@ -9,6 +9,7 @@ import (
 	reflect "reflect"
 
 	db "github.com/Bakhram74/amazon-backend.git/db/sqlc"
+	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -35,6 +36,20 @@ func (m *MockAuthorization) EXPECT() *MockAuthorizationMockRecorder {
 	return m.recorder
 }
 
+// CreateSession mocks base method.
+func (m *MockAuthorization) CreateSession(ctx context.Context, arg db.CreateSessionParams) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateSession", ctx, arg)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateSession indicates an expected call of CreateSession.
+func (mr *MockAuthorizationMockRecorder) CreateSession(ctx, arg interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateSession", reflect.TypeOf((*MockAuthorization)(nil).CreateSession), ctx, arg)
+}
+
 // CreateUser mocks base method.
 func (m *MockAuthorization) CreateUser(ctx context.Context, arg db.CreateUserParams) (db.User, error) {
 	m.ctrl.T.Helper()
@@ -48,6 +63,21 @@ func (m *MockAuthorization) CreateUser(ctx context.Context, arg db.CreateUserPar
 func (mr *MockAuthorizationMockRecorder) CreateUser(ctx, arg interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockAuthorization)(nil).CreateUser), ctx, arg)
+}
+
+// GetSession mocks base method.
+func (m *MockAuthorization) GetSession(ctx context.Context, id uuid.UUID) (db.Session, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetSession", ctx, id)
+	ret0, _ := ret[0].(db.Session)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetSession indicates an expected call of GetSession.
+func (mr *MockAuthorizationMockRecorder) GetSession(ctx, id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetSession", reflect.TypeOf((*MockAuthorization)(nil).GetSession), ctx, id)
 }
 
 // GetUser mocks base method.
