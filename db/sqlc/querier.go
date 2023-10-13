@@ -11,6 +11,7 @@ import (
 )
 
 type Querier interface {
+	CreateOrder(ctx context.Context, items []interface{}) (Order, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) error
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)

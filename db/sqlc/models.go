@@ -5,10 +5,99 @@
 package db
 
 import (
+	"database/sql/driver"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type EnumOrderStatus string
+
+const (
+	EnumOrderStatusPENDING   EnumOrderStatus = "PENDING"
+	EnumOrderStatusPAYED     EnumOrderStatus = "PAYED"
+	EnumOrderStatusSHIPPED   EnumOrderStatus = "SHIPPED"
+	EnumOrderStatusDELIVERED EnumOrderStatus = "DELIVERED"
+)
+
+func (e *EnumOrderStatus) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = EnumOrderStatus(s)
+	case string:
+		*e = EnumOrderStatus(s)
+	default:
+		return fmt.Errorf("unsupported scan type for EnumOrderStatus: %T", src)
+	}
+	return nil
+}
+
+type NullEnumOrderStatus struct {
+	EnumOrderStatus EnumOrderStatus
+	Valid           bool // Valid is true if EnumOrderStatus is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullEnumOrderStatus) Scan(value interface{}) error {
+	if value == nil {
+		ns.EnumOrderStatus, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.EnumOrderStatus.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullEnumOrderStatus) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.EnumOrderStatus), nil
+}
+
+type Category struct {
+	ID        int64              `json:"id"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	Name      pgtype.Text        `json:"name"`
+}
+
+type Order struct {
+	ID        int64               `json:"id"`
+	UpdatedAt pgtype.Timestamptz  `json:"updated_at"`
+	CreatedAt pgtype.Timestamptz  `json:"created_at"`
+	Status    NullEnumOrderStatus `json:"status"`
+	Items     []interface{}       `json:"items"`
+}
+
+type OrderItem struct {
+	ID        int64              `json:"id"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	Quantity  pgtype.Int4        `json:"quantity"`
+	Price     pgtype.Int4        `json:"price"`
+}
+
+type Product struct {
+	ID          int64              `json:"id"`
+	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
+	CreatedAt   pgtype.Timestamptz `json:"created_at"`
+	Name        pgtype.Text        `json:"name"`
+	Slug        pgtype.Text        `json:"slug"`
+	Description pgtype.Text        `json:"description"`
+	Price       pgtype.Int4        `json:"price"`
+	Images      []string           `json:"images"`
+}
+
+type Review struct {
+	ID        int64              `json:"id"`
+	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
+	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	Rating    pgtype.Int4        `json:"rating"`
+	Text      pgtype.Text        `json:"text"`
+}
 
 type Session struct {
 	ID           uuid.UUID `json:"id"`
@@ -22,12 +111,12 @@ type Session struct {
 }
 
 type User struct {
-	ID         int64     `json:"id"`
-	Name       string    `json:"name"`
-	Email      string    `json:"email"`
-	Phone      string    `json:"phone"`
-	Password   string    `json:"password"`
-	AvatarPath string    `json:"avatar_path"`
-	UpdatedAt  time.Time `json:"updated_at"`
-	CreatedAt  time.Time `json:"created_at"`
+	ID         int64              `json:"id"`
+	Name       string             `json:"name"`
+	Email      string             `json:"email"`
+	Phone      string             `json:"phone"`
+	Password   string             `json:"password"`
+	AvatarPath string             `json:"avatar_path"`
+	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
+	CreatedAt  time.Time          `json:"created_at"`
 }

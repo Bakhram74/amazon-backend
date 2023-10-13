@@ -13,10 +13,10 @@ dropDB:
 migrate:
 	migrate create -ext sql -dir db/schema/migration -seq init_schema
 
-migrateUP:
+migrate_up:
 	migrate -path db/schema/migration -database "postgresql://postgres:123456@localhost:5432/amazon-record?sslmode=disable" -verbose up
 
-migrateDown:
+migrate_down:
 	migrate -path db/schema/migration -database "postgresql://postgres:123456@localhost:5432/amazon-record?sslmode=disable" -verbose down
 
 sqlc:
@@ -32,4 +32,4 @@ mock:
 	go generate internal/service/service.go
 
 
-PHONY:  docker_run createDB dropDB docker_exec migrate migrateUP migrateDown sqlc test server mock
+PHONY:  docker_run createDB dropDB docker_exec migrate migrate_up migrate_down sqlc test server mock
