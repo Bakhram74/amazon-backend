@@ -1,13 +1,13 @@
 CREATE TABLE "order_item"
 (
     "id"         serial PRIMARY KEY,
-    "updated_at" timestamptz,
-    "created_at" timestamptz DEFAULT (now()),
-    "quantity"   int,
-    "price"      int,
+    "updated_at" timestamptz NOT NULL DEFAULT (now()),
+    "created_at" timestamptz NOT NULL DEFAULT (now()),
+    "quantity"   int NOT NULL ,
+    "price"      int NOT NULL ,
 
-    "order_id"   int,
-    "product_id" int
+    "order_id"   int NOT NULL ,
+    "product_id" int NOT NULL
 );
 
 ALTER TABLE "order_item"

@@ -1,13 +1,12 @@
-CREATE TYPE enum_order_status AS ENUM ('PENDING', 'PAYED', 'SHIPPED','DELIVERED');
 
 CREATE TABLE "order"
 (
     "id"         serial PRIMARY KEY,
-    "updated_at" timestamptz,
-    "created_at" timestamptz       DEFAULT (now()),
-    "status"     enum_order_status DEFAULT ('PENDING'),
+    "updated_at" timestamptz NOT NULL DEFAULT (now()),
+    "created_at" timestamptz   NOT NULL    DEFAULT (now()),
+    "status"     enum_order_status NOT NULL DEFAULT ('PENDING'),
 
-    "user_id"    bigint
+    "user_id"    bigint NOT NULL
 );
 
 

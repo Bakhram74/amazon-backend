@@ -1,13 +1,13 @@
 CREATE TABLE "review"
 (
     "id"          serial PRIMARY KEY,
-    "updated_at"  timestamptz ,
-    "created_at"  timestamptz   DEFAULT (now()),
-    "rating" int,
-    "text" text,
+    "updated_at"  timestamptz NOT NULL DEFAULT (now()),
+    "created_at"  timestamptz NOT NULL  DEFAULT (now()),
+    "rating" int NOT NULL DEFAULT (0),
+    "text" text NOT NULL DEFAULT (''),
 
-    "user_id" bigint,
-    "product_id" int
+    "user_id" bigint NOT NULL ,
+    "product_id" int NOT NULL
 );
 
 ALTER TABLE "review"

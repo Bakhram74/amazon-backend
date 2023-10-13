@@ -10,7 +10,7 @@ import (
 )
 
 const createUser = `-- name: CreateUser :one
-INSERT INTO users ("name",
+INSERT INTO "user" ("name",
                    "email",
                    "password"
 
@@ -41,7 +41,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 }
 
 const getUser = `-- name: GetUser :one
-SELECT id, name, email, phone, password, avatar_path, updated_at, created_at FROM users
+SELECT id, name, email, phone, password, avatar_path, updated_at, created_at FROM "user"
 WHERE email = $1 LIMIT 1
 `
 

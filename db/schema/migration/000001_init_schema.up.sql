@@ -6,6 +6,6 @@ CREATE TABLE "user"
     "phone"       text        NOT NULL DEFAULT (''),
     "password"    text        NOT NULL,
     "avatar_path" text        NOT NULL DEFAULT ('/uploads/default-avatar.png'),
-    "updated_at"  timestamptz ,
+    "updated_at"  timestamptz NOT NULL DEFAULT (now()),
     "created_at"  timestamptz NOT NULL DEFAULT (now())
 );

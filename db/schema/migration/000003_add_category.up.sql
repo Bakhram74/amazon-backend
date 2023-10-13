@@ -1,7 +1,7 @@
 CREATE TABLE "category"
 (
     "id"          serial PRIMARY KEY,
-    "updated_at"  timestamptz ,
-    "created_at"  timestamptz   DEFAULT (now()),
-    "name"        text UNIQUE
+    "updated_at"  timestamptz NOT NULL DEFAULT (now()),
+    "created_at"  timestamptz NOT NULL  DEFAULT (now()),
+    "name"        text NOT NULL UNIQUE
 );

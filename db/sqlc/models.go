@@ -5,118 +5,76 @@
 package db
 
 import (
-	"database/sql/driver"
-	"fmt"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgtype"
 )
-
-type EnumOrderStatus string
-
-const (
-	EnumOrderStatusPENDING   EnumOrderStatus = "PENDING"
-	EnumOrderStatusPAYED     EnumOrderStatus = "PAYED"
-	EnumOrderStatusSHIPPED   EnumOrderStatus = "SHIPPED"
-	EnumOrderStatusDELIVERED EnumOrderStatus = "DELIVERED"
-)
-
-func (e *EnumOrderStatus) Scan(src interface{}) error {
-	switch s := src.(type) {
-	case []byte:
-		*e = EnumOrderStatus(s)
-	case string:
-		*e = EnumOrderStatus(s)
-	default:
-		return fmt.Errorf("unsupported scan type for EnumOrderStatus: %T", src)
-	}
-	return nil
-}
-
-type NullEnumOrderStatus struct {
-	EnumOrderStatus EnumOrderStatus
-	Valid           bool // Valid is true if EnumOrderStatus is not NULL
-}
-
-// Scan implements the Scanner interface.
-func (ns *NullEnumOrderStatus) Scan(value interface{}) error {
-	if value == nil {
-		ns.EnumOrderStatus, ns.Valid = "", false
-		return nil
-	}
-	ns.Valid = true
-	return ns.EnumOrderStatus.Scan(value)
-}
-
-// Value implements the driver Valuer interface.
-func (ns NullEnumOrderStatus) Value() (driver.Value, error) {
-	if !ns.Valid {
-		return nil, nil
-	}
-	return string(ns.EnumOrderStatus), nil
-}
 
 type Category struct {
-	ID        int64              `json:"id"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	Name      pgtype.Text        `json:"name"`
+	ID        int32     `json:"id"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	Name      string    `json:"name"`
 }
 
 type Order struct {
-	ID        int64               `json:"id"`
-	UpdatedAt pgtype.Timestamptz  `json:"updated_at"`
-	CreatedAt pgtype.Timestamptz  `json:"created_at"`
-	Status    NullEnumOrderStatus `json:"status"`
-	Items     []interface{}       `json:"items"`
+	ID        int32       `json:"id"`
+	UpdatedAt time.Time   `json:"updated_at"`
+	CreatedAt time.Time   `json:"created_at"`
+	Status    interface{} `json:"status"`
+	UserID    int64       `json:"user_id"`
 }
 
 type OrderItem struct {
-	ID        int64              `json:"id"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	Quantity  pgtype.Int4        `json:"quantity"`
-	Price     pgtype.Int4        `json:"price"`
+	ID        int32     `json:"id"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	Quantity  int32     `json:"quantity"`
+	Price     int32     `json:"price"`
+	OrderID   int32     `json:"order_id"`
+	ProductID int32     `json:"product_id"`
 }
 
 type Product struct {
-	ID          int64              `json:"id"`
-	UpdatedAt   pgtype.Timestamptz `json:"updated_at"`
-	CreatedAt   pgtype.Timestamptz `json:"created_at"`
-	Name        pgtype.Text        `json:"name"`
-	Slug        pgtype.Text        `json:"slug"`
-	Description pgtype.Text        `json:"description"`
-	Price       pgtype.Int4        `json:"price"`
-	Images      []string           `json:"images"`
+	ID          int32     `json:"id"`
+	UpdatedAt   time.Time `json:"updated_at"`
+	CreatedAt   time.Time `json:"created_at"`
+	Name        string    `json:"name"`
+	Slug        string    `json:"slug"`
+	Description string    `json:"description"`
+	Price       int32     `json:"price"`
+	Images      []string  `json:"images"`
+	CategoryID  int32     `json:"category_id"`
 }
 
 type Review struct {
-	ID        int64              `json:"id"`
-	UpdatedAt pgtype.Timestamptz `json:"updated_at"`
-	CreatedAt pgtype.Timestamptz `json:"created_at"`
-	Rating    pgtype.Int4        `json:"rating"`
-	Text      pgtype.Text        `json:"text"`
+	ID        int32     `json:"id"`
+	UpdatedAt time.Time `json:"updated_at"`
+	CreatedAt time.Time `json:"created_at"`
+	Rating    int32     `json:"rating"`
+	Text      string    `json:"text"`
+	UserID    int64     `json:"user_id"`
+	ProductID int32     `json:"product_id"`
 }
 
 type Session struct {
 	ID           uuid.UUID `json:"id"`
-	Userid       int64     `json:"userid"`
 	RefreshToken string    `json:"refresh_token"`
 	UserAgent    string    `json:"user_agent"`
 	ClientIp     string    `json:"client_ip"`
 	IsBlocked    bool      `json:"is_blocked"`
 	ExpiresAt    time.Time `json:"expires_at"`
 	CreatedAt    time.Time `json:"created_at"`
+	Userid       int64     `json:"userid"`
 }
 
 type User struct {
-	ID         int64              `json:"id"`
-	Name       string             `json:"name"`
-	Email      string             `json:"email"`
-	Phone      string             `json:"phone"`
-	Password   string             `json:"password"`
-	AvatarPath string             `json:"avatar_path"`
-	UpdatedAt  pgtype.Timestamptz `json:"updated_at"`
-	CreatedAt  time.Time          `json:"created_at"`
+	ID         int64     `json:"id"`
+	Name       string    `json:"name"`
+	Email      string    `json:"email"`
+	Phone      string    `json:"phone"`
+	Password   string    `json:"password"`
+	AvatarPath string    `json:"avatar_path"`
+	UpdatedAt  time.Time `json:"updated_at"`
+	CreatedAt  time.Time `json:"created_at"`
 }

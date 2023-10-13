@@ -50,7 +50,7 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 }
 
 const getSession = `-- name: GetSession :one
-SELECT id, userid, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at FROM sessions
+SELECT id, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at, userid FROM sessions
 WHERE id = $1 LIMIT 1
 `
 
@@ -59,13 +59,13 @@ func (q *Queries) GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 	var i Session
 	err := row.Scan(
 		&i.ID,
-		&i.Userid,
 		&i.RefreshToken,
 		&i.UserAgent,
 		&i.ClientIp,
 		&i.IsBlocked,
 		&i.ExpiresAt,
 		&i.CreatedAt,
+		&i.Userid,
 	)
 	return i, err
 }
