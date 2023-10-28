@@ -44,14 +44,21 @@ func (h *Handler) InitRoutes() *gin.Engine {
 
 	// Register the middleware
 	router.Use(cors.New(corsConfig))
+	auth := router.Group("/auth")
+	{
+		auth.POST("/sign-up", h.signUp)
+		auth.POST("/sign-in", h.signIn)
+		auth.POST("/refresh", h.renewAccessToken)
+	}
 	api := router.Group("/api")
 	{
-		auth := api.Group("/auth")
+		user := api.Group("/").Use(authMiddleware(h.tokenMaker))
 		{
-			auth.POST("/sign-up", h.signUp)
-			auth.POST("/sign-in", h.signIn)
-			auth.POST("/refresh", h.renewAccessToken)
+			user.GET("/profile", h.getProfile)
+			//user.POST("/profile", h.updateProfile)
+			//user.PATCH("/profile/favorites/:productId", h.getProfile)
 		}
+
 	}
 
 	return router

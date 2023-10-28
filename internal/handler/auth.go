@@ -95,7 +95,7 @@ func (h *Handler) signIn(ctx *gin.Context) {
 	}
 	err = h.services.CreateSession(ctx, db.CreateSessionParams{
 		ID:           refreshPayload.ID,
-		Userid:       user.ID,
+		UserID:       user.ID,
 		RefreshToken: refreshToken,
 		UserAgent:    ctx.Request.UserAgent(),
 		ClientIp:     ctx.ClientIP(),
@@ -153,7 +153,7 @@ func (h *Handler) renewAccessToken(ctx *gin.Context) {
 		return
 	}
 
-	if session.Userid != refreshPayload.UserId {
+	if session.UserID != refreshPayload.UserId {
 		err := fmt.Errorf("incorrect session user")
 		ctx.JSON(http.StatusUnauthorized, err.Error())
 		return
@@ -189,7 +189,7 @@ func (h *Handler) renewAccessToken(ctx *gin.Context) {
 	}
 	err = h.services.CreateSession(ctx, db.CreateSessionParams{
 		ID:           refreshPayload.ID,
-		Userid:       refreshPayload.UserId,
+		UserID:       refreshPayload.UserId,
 		RefreshToken: refreshToken,
 		UserAgent:    ctx.Request.UserAgent(),
 		ClientIp:     ctx.ClientIP(),

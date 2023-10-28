@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	authorizationHeaderKey  = "Authorization"
+	authorizationHeaderKey  = "authorization"
 	authorizationTypeBearer = "Bearer"
 	userCtx                 = "userId"
 	authorizationPayloadKey = "authorization_payload"
@@ -22,14 +22,14 @@ func authMiddleware(tokenMaker token.Maker) gin.HandlerFunc {
 
 		if len(authorizationHeader) == 0 {
 			err := errors.New("authorization header is not provided")
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
 
 		fields := strings.Split(authorizationHeader, " ")
-		if len(fields) != 2 || fields[0] != "Bearer" {
+		if len(fields) != 2 || fields[0] != authorizationTypeBearer {
 			err := errors.New("invalid authorization header format")
-			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err)
+			ctx.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
 			return
 		}
 

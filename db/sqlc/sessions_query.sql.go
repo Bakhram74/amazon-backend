@@ -15,7 +15,7 @@ import (
 const createSession = `-- name: CreateSession :exec
 INSERT INTO sessions (
     id,
-    userid,
+    user_id,
     refresh_token,
     user_agent,
     client_ip,
@@ -28,7 +28,7 @@ INSERT INTO sessions (
 
 type CreateSessionParams struct {
 	ID           uuid.UUID `json:"id"`
-	Userid       int64     `json:"userid"`
+	UserID       int64     `json:"user_id"`
 	RefreshToken string    `json:"refresh_token"`
 	UserAgent    string    `json:"user_agent"`
 	ClientIp     string    `json:"client_ip"`
@@ -39,7 +39,7 @@ type CreateSessionParams struct {
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) error {
 	_, err := q.db.Exec(ctx, createSession,
 		arg.ID,
-		arg.Userid,
+		arg.UserID,
 		arg.RefreshToken,
 		arg.UserAgent,
 		arg.ClientIp,
@@ -50,7 +50,7 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) er
 }
 
 const getSession = `-- name: GetSession :one
-SELECT id, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at, userid FROM sessions
+SELECT id, refresh_token, user_agent, client_ip, is_blocked, expires_at, created_at, user_id FROM sessions
 WHERE id = $1 LIMIT 1
 `
 
@@ -65,7 +65,7 @@ func (q *Queries) GetSession(ctx context.Context, id uuid.UUID) (Session, error)
 		&i.IsBlocked,
 		&i.ExpiresAt,
 		&i.CreatedAt,
-		&i.Userid,
+		&i.UserID,
 	)
 	return i, err
 }

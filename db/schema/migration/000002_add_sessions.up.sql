@@ -8,8 +8,8 @@ CREATE TABLE "sessions"
     "expires_at"    timestamptz NOT NULL,
     "created_at"    timestamptz NOT NULL DEFAULT (now()),
 
-    "userid"          bigint     NOT NULL
+    "user_id"          bigint     NOT NULL
 );
 
 ALTER TABLE "sessions"
-    ADD FOREIGN KEY ("userid") REFERENCES "user" ("id");
+    ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");

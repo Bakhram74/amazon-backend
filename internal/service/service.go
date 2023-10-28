@@ -16,12 +16,18 @@ type Authorization interface {
 	GetSession(ctx context.Context, id uuid.UUID) (db.Session, error)
 }
 
+type Profile interface {
+	GetUserByID(ctx context.Context, id int64) (db.User, error)
+}
+
 type Service struct {
 	Authorization
+	Profile
 }
 
 func NewService(repos *repository.Repository) *Service {
 	return &Service{
 		Authorization: NewAuthService(repos.Authorization),
+		Profile:       NewProfileService(repos.Profile),
 	}
 }

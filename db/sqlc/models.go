@@ -44,6 +44,7 @@ type Product struct {
 	Description string    `json:"description"`
 	Price       int32     `json:"price"`
 	Images      []string  `json:"images"`
+	UserID      int64     `json:"user_id"`
 	CategoryID  int32     `json:"category_id"`
 }
 
@@ -65,7 +66,7 @@ type Session struct {
 	IsBlocked    bool      `json:"is_blocked"`
 	ExpiresAt    time.Time `json:"expires_at"`
 	CreatedAt    time.Time `json:"created_at"`
-	Userid       int64     `json:"userid"`
+	UserID       int64     `json:"user_id"`
 }
 
 type User struct {
