@@ -11,6 +11,9 @@ import (
 )
 
 type Querier interface {
+	CreateCategory(ctx context.Context, arg CreateCategoryParams) (Category, error)
+	CreateProduct(ctx context.Context, arg CreateProductParams) (Product, error)
+	CreateReview(ctx context.Context, arg CreateReviewParams) (Review, error)
 	CreateSession(ctx context.Context, arg CreateSessionParams) error
 	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	GetSession(ctx context.Context, id uuid.UUID) (Session, error)

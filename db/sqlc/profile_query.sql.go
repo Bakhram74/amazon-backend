@@ -11,7 +11,6 @@ import (
 
 const getUserByID = `-- name: GetUserByID :one
 SELECT id, name, email, phone, password, avatar_path, updated_at, created_at FROM "user"
-
 WHERE id = $1 LIMIT 1
 `
 

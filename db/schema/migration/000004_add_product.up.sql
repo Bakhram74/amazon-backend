@@ -10,10 +10,8 @@ CREATE TABLE "product"
     "images"      text[],
 
     "user_id"     bigint      NOT NULL DEFAULT (0),
-    "category_id" int         NOT NULL DEFAULT (0)
+    "category_id" int         NOT NULL
 );
 
 ALTER TABLE "product"
     ADD FOREIGN KEY ("category_id") REFERENCES "category" ("id");
-ALTER TABLE "product"
-    ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
